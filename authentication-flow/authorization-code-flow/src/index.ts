@@ -16,6 +16,11 @@ app.get('/login', (req, res) => {
     res.redirect(url);
 });
 
+app.get('/callback', (req, res) => {
+    console.log(req.query);
+    res.send('ok')
+})
+
 app.listen(3000, () => {
     console.log('Listering on port 3000');
 })
