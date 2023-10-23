@@ -30,10 +30,14 @@ app.get('/login', (req, res) => {
 
     //prevent replay attack
     const nonce = crypto.randomBytes(16).toString("base64");
+    const state = crypto.randomBytes(16).toString("base64");
+
 
     console.log(nonce, 'details of nonce')
     // @ts-expect-error - type mismatch
     req.session.nonce = nonce;
+    // @ts-expect-error - type mismatch
+    req.session.state = state;
 
     req.session.save();
 
@@ -47,7 +51,8 @@ app.get('/login', (req, res) => {
         redirect_uri: 'http://localhost:3000/callback',
         response_type: 'code',
         scope: 'openid',
-        nonce
+        nonce,
+        state
     });
 
     const url = `http://localhost:8080/realms/fullcycle-realm/protocol/openid-connect/auth?${loginParams.toString()}`
@@ -56,6 +61,19 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/callback', async (req, res) => {
+
+    //ultima inclusão antes do CSRF
+    //@ts-expect-error - type mismatch
+    if (req.session.user) {
+        return res.redirect("/admin")
+    }
+
+    //@ts-expect-error - type mismatch
+    if (req.query.state !== req.session.state) {
+        //possível melhor lógica retornar o usuario para a tela de login ao invés de exibir a msg de erro atual
+        res.status(401).json({ message: "Unauthenticated" })
+    }
+
     console.log(req.query);
 
     //gerar o nonse
