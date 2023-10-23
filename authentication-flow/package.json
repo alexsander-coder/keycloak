@@ -6,6 +6,9 @@
   "scripts": {
     "authorization-code": "nodemon --exec ts-node-esm authorization-code-flow/src/index.ts"
   },
+  "workspaces": [
+    "vite-project"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
