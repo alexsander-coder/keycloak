@@ -12,7 +12,7 @@ export function makeLoginUrl() {
   const loginUrlParams = new URLSearchParams({
     client_id: "fullcycle-client",
     redirect_uri: "http://localhost:3000/callback",
-    response_type: "token id_token",
+    response_type: "token id_token code",
     // scope: "openid",
     nonce: nonce,
     state: state,
@@ -21,22 +21,71 @@ export function makeLoginUrl() {
   return `http://localhost:8080/realms/fullcycle-realm/protocol/openid-connect/auth?${loginUrlParams.toString()}`;
 }
 
+export function exchangeCodeForToken(code: string) {
+  const tokenUrlParams = new URLSearchParams({
+    client_id: "fullcycle-client",
+    grant_type: "authorization_code",
+    code: code,
+    redirect_uri: "http://localhost:3000/callback",
+    nonce: Cookies.get("nonce") as string,
+  });
 
-export function login(accessToken: string, idToken: string, state: string) {
+  return fetch(
+    "http://localhost:8080/realms/fullcycle-realm/protocol/openid-connect/token",
+
+    {
+      method: 'POST',
+      // mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: tokenUrlParams.toString()
+    }
+  )
+
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((res) => {
+      return login(res.access_token, null, res.refresh_token);
+    })
+}
+
+export function login(
+  accessToken: string,
+  idToken: string | null,
+  refreshToken?: string,
+  state?: string
+) {
 
   const stateCookie = Cookies.get("state");
-  if (stateCookie !== state) {
-    console.log('error details')
+  if (state && stateCookie !== state) {
     throw new Error('Invalid state');
   }
 
   let decodedAccessToken = null;
   let decodedIdToken = null;
+  let decodedRefreshToken = null;
 
   try {
-
     decodedAccessToken = decodeJwt(accessToken);
-    decodedIdToken = decodeJwt(idToken);
+
+    if (idToken) {
+      decodedIdToken = decodeJwt(idToken)
+    }
+
+    if (refreshToken) {
+      decodedRefreshToken = decodeJwt(refreshToken);
+    }
+
+    if (idToken) {
+      decodedIdToken = decodeJwt(idToken);
+    }
+
+
 
   } catch (e) {
     throw new Error('Invalid Token')
@@ -46,12 +95,25 @@ export function login(accessToken: string, idToken: string, state: string) {
     throw new Error('Invalid nonce');
   }
 
-  if (decodedIdToken.nonce !== Cookies.get("nonce")) {
+
+
+  if (decodedRefreshToken && decodedRefreshToken.nonce !== Cookies.get("nonce")) {
+    throw new Error("Invalid nonce");
+  }
+
+  if (decodedIdToken && decodedIdToken.nonce !== Cookies.get("nonce")) {
     throw new Error('Invalid nonce')
   }
 
   Cookies.set("access_token", accessToken);
-  Cookies.set("id_token", idToken);
+
+  if (idToken) {
+    Cookies.set("id_token", idToken);
+  }
+
+  if (decodedRefreshToken) {
+    Cookies.set("refresh_token", refreshToken as string);
+  }
 
   return decodedAccessToken;
 }
@@ -83,6 +145,7 @@ export function makeLogoutUrl() {
 
   Cookies.remove("access_token");
   Cookies.remove("id_token");
+  Cookies.remove("refresh_token");
   Cookies.remove("nonce");
   Cookies.remove("state");
 

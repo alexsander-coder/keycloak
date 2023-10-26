@@ -1,5 +1,5 @@
 {
-  "name": "vite-project",
+  "name": "hybrid-flow",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@types/cors": "^2.8.15",
-    "cors": "^2.8.5",
     "jose": "^4.15.4",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",

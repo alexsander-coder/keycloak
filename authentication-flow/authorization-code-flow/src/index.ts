@@ -1,9 +1,12 @@
 import express from 'express';
 import crypto from 'crypto';
 import session from 'express-session';
+import cors from 'cors';
 import jwt from 'jsonwebtoken';
 
 const app = express();
+
+app.use(cors());
 
 const memoryStore = new session.MemoryStore()
 
