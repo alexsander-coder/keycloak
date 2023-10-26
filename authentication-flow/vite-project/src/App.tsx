@@ -2,6 +2,9 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Login } from "./Login";
 import { Logout } from "./Logout";
 import { Callback } from "./Callback";
+import { AuthProvider } from "./AuthProvider";
+import { Admin } from "./Admin";
+import { PrivateRoute } from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +17,10 @@ const router = createBrowserRouter([
   },
   {
     path: "admin",
-    element: <div>Admin</div>
+    element:
+      <PrivateRoute>
+        <Admin />
+      </PrivateRoute>
   },
   {
     path: "callback",
@@ -24,9 +30,9 @@ const router = createBrowserRouter([
 
 function App() {
 
-  return (
+  return <AuthProvider>
     <RouterProvider router={router} />
-  )
+  </AuthProvider>;
 }
 
 export default App

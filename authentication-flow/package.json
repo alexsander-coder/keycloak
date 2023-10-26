@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "authorization-code": "nodemon --exec ts-node-esm authorization-code-flow/src/index.ts",
+    "dev": "nodemon --exec ts-node-esm authorization-code-flow/src/index.ts",
     "implicit": "cd vite-project && npm run dev"
   },
   "workspaces": [

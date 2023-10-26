@@ -1,0 +1,9 @@
+declare module 'express-session' {
+  export interface SessionData {
+    nonce?: string;
+    state?: string;
+    user?: any;
+    access_token?: string;
+    id_token?: string;
+  }
+}

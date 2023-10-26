@@ -1,7 +1,15 @@
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./AuthProvider";
+
 export function Logout() {
-  return (
-    <div>
-      <h1>Logout</h1>
-    </div>
-  )
+  const { makeLogoutUrl } = useContext(AuthContext);
+
+  useEffect(() => {
+    const logoutUrl = makeLogoutUrl();
+    if (logoutUrl) {
+      window.location.href = logoutUrl;
+    }
+  }, [makeLogoutUrl]);
+
+  return <div>Loading...</div>;
 }
