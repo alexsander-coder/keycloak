@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --exec ts-node-esm authorization-code-flow/src/index.ts",
     "implicit": "cd vite-project && npm run dev",
-    "hybrid": "cd hybrid-flow && npm run dev"
+    "hybrid": "cd hybrid-flow && npm run dev",
+    "resource-owner": "nodemon --exec ts-node-esm resource_owner_password_credentials/src/index.ts"
   },
   "workspaces": [
     "vite-project",
